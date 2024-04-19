@@ -1,20 +1,18 @@
-//login.js
-
 import React, { useState } from 'react';
-import axios from 'axios';
+import apiService from '../services/apiService'; // Import the apiService module
 import './Login.css';
 import '@fortawesome/fontawesome-free/css/fontawesome.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 
 const Login = () => {
-  const [isSignIn, setIsSignIn] = useState(true); // Set initial state to true for Sign In
+  const [isSignIn, setIsSignIn] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: ''
   });
-  const [signInError, setSignInError] = useState(null); // State variable to store sign-in error message
-  const [signUpError, setSignUpError] = useState(null); // State variable to store sign-up error message
+  const [signInError, setSignInError] = useState(null);
+  const [signUpError, setSignUpError] = useState(null);
 
   const toggleForm = () => {
     setIsSignIn(prevState => !prevState);
@@ -36,60 +34,36 @@ const Login = () => {
           setSignInError("Please fill in all the fields.");
           return;
         }
-        // Login
-        const response = await axios.post('http://localhost:80/api/login', {
-          email: formData.email,
-          password: formData.password
-        });
-        console.log(response.data); // Log response from the backend
-        // Check if login was successful
-        if (response.status === 200) {
-          // Redirect the user to the dashboard or any other page upon successful login
-          window.location.href = '/user';
-        } else {
-          // Handle other cases, e.g., display error message
-          console.error('Login failed:', response.data.message);
-          setSignInError(response.data.message); // Set sign-in error message
-        }
+        const response = await apiService.login(formData);
+        console.log(response);
+        window.location.href = '/user';
       } else {
         if (!formData.name || !formData.email || !formData.password) {
           setSignUpError("Please fill in all the fields.");
           return;
         }
-        // Signup
-        const response = await axios.post('http://localhost:80/api/signup', {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password
-        });
-        console.log(response.data); // Log response from the backend
-        // Check if signup was successful
-        if (response.status === 201) {
-          window.location.href = '#';
-          setSignUpError("User registered successfully.");
-        } else {
-          console.error('Signup failed:', response.data.message);
-          setSignUpError(response.data.message); // Set sign-up error message
-        }
+        const response = await apiService.signup(formData);
+        console.log(response);
+        window.location.href = '#';
+        setSignUpError("User registered successfully.");
       }
     } catch (error) {
-      console.error('Error:', error.response?.data); // Log error message
-      if (error.response) {
-        if (error.response.status === 500) {
-          setSignUpError("Registration Failed.");
-        } else if (error.response.status === 400 && isSignIn) {
-          setSignInError("Email not found.");
-        } else if (error.response.status === 401 && isSignIn) {
-          setSignInError("Incorrect password.");
-        } else if (error.response.status === 400 && !isSignIn) {
-          setSignUpError("Email already exists.");
-        }
+      console.error('Error:', error); // Log error message
+      if (error.status === 500) {
+        setSignUpError("Registration Failed.");
+      } else if (error.status === 400 && isSignIn) {
+        setSignInError("Email not found.");
+      } else if (error.status === 401 && isSignIn) {
+        setSignInError("Incorrect password.");
+      } else if (error.status === 400 && !isSignIn) {
+        setSignUpError("Email already exists.");
       } else {
         setSignUpError("Server is currently unavailable!!! Please try again later.");
         setSignInError("Server is currently unavailable!!! Please try again later.");
       }
     }
   };
+
   return (
     <div className="login">
       <div className={`container ${isSignIn ? 'sign-in-active' : 'sign-up-active'}`} id="container">
