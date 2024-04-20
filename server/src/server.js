@@ -1,16 +1,19 @@
 // src/server.js
-require('dotenv').config();
 const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 80;
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 
+const app = express();
+const PORT = process.env.PORT || 80;
+
+// Middleware
 app.use(express.json());
 app.use(cors());
 
-app.use('/api/auth', authRoutes);
+// Routes
+app.use('/api', authRoutes);
 
+// Start the server
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

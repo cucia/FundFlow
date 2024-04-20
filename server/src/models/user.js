@@ -1,4 +1,4 @@
 // src/models/userModel.js
-const connection = require('../config/dbConfig');
+const db = require('../config/dbConfig');
 
-// Define user model methods
+// User model logic
