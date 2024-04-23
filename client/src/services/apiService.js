@@ -19,6 +19,15 @@ const apiService = {
     } catch (error) {
       throw error.response.data;
     }
+  },
+
+  logout: async () => {
+    try {
+      const response = await axios.post(`${API_URL}/logout`);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
   }
 };
 
